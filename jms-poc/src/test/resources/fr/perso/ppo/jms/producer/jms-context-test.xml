@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/jms 
+                           http://www.springframework.org/schema/jms/spring-jms.xsd
+                           http://activemq.apache.org/schema/core 
+                           http://activemq.apache.org/schema/core/activemq-core.xsd">
+ 
+    <context:component-scan base-package="fr.perso" />
+    
+    <!--  Embedded ActiveMQ Broker -->
+<!--     <amq:broker id="broker" useJmx="false" persistent="false"> -->
+<!--         <amq:transportConnectors> -->
+<!--             <amq:transportConnector uri="tcp://localhost:0" /> -->
+<!--         </amq:transportConnectors> -->
+<!--     </amq:broker> -->
+
+    <!--  ActiveMQ Destination  -->
+<!--     <amq:queue id="destination" physicalName="org.springbyexample.jms.test" /> -->
+    
+     <amq:topic id="destination" physicalName="My_topic"/>
+     <amq:topic id="destinationDLQ" physicalName="DLQT.My_topic" />
+
+    <!-- JMS ConnectionFactory to use, configuring the embedded broker using XML -->
+<!--     <amq:connectionFactory id="jmsFactory" brokerURL="vm://localhost" /> -->
+
+    <!-- JMS Producer Configuration -->
+    <bean id="jmsProducerConnectionFactory" 
+          class="org.springframework.jms.connection.SingleConnectionFactory"
+          p:targetConnectionFactory-ref="connectionFactory" />
+
+    <!-- to use load balancing do not use Spring wrapper on ConnectionFactory, use directly connectionFactory from the target JMS Broker-->
+    <bean id="jmsProducerTemplate" class="org.springframework.jms.core.JmsTemplate"
+          p:connectionFactory-ref="connectionFactory"
+          p:defaultDestination-ref="destination" 
+          p:deliveryMode="1"
+          p:timeToLive="20000" 
+          p:explicitQosEnabled="true"/>
+
+     <!-- 
+    <bean id="connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
+                <property name="targetConnectionFactory" >
+                        <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                                 <property name="brokerURL" value="vm://localhost?broker.schedulerSupport=false&amp;broker.persistent=false"/>
+                                <property name="brokerURL" value="tcp://localhost:61616"/>  
+                                <property name="brokerURL" value="failover:(tcp://localhost:61616,tcp://localhost:61618)?randomize=true" />
+                                <property name="statsEnabled" value="true"/>
+                                <property name="password" value="userpassword"/>
+                                <property name="userName" value="user"/>
+                                <property name="sendTimeout" value="1000" />
+                                <property name="alwaysSyncSend" value="true" />
+                                 
+                                <property name="redeliveryPolicy">
+                                	<bean class="org.apache.activemq.RedeliveryPolicy" >
+                                		 <property name="maximumRedeliveries" value="0" />
+                                	</bean>
+                                </property>
+                                
+                        </bean>
+                </property> 
+                 <property name="sessionCacheSize" value="10"/>
+                 <property name="cacheProducers" value="false"/> 
+        </bean>
+        -->
+   
+   
+    
+    <bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+           <property name="connectionFactory" >
+                        <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                                 <!--  <property name="brokerURL" value="vm://localhost?broker.schedulerSupport=false&amp;broker.persistent=false"/>
+                                <property name="brokerURL" value="tcp://localhost:61616"/>-->  
+                                <property name="brokerURL" value="failover:(tcp://localhost:41616,tcp://localhost:41618)?randomize=true" />
+                                <property name="statsEnabled" value="true"/>
+                                <property name="password" value="userpassword"/>
+                                <property name="userName" value="user"/>
+<!--                                 <property name="sendTimeout" value="1000" /> -->
+                                <property name="alwaysSyncSend" value="true" />
+                                 
+                               
+                                
+                        </bean>
+                </property>
+                <property name="maxConnections" value="4" />
+			    <property name="idleTimeout" value="15000" />
+		       	<property name="expiryTimeout" value="0" />                    
+        </bean>
+      
+            
+    <!-- 
+    <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+                                <property name="brokerURL" value="failover:(tcp://localhost:61616,tcp://localhost:61618)?randomize=true" />
+                                <property name="statsEnabled" value="true"/>
+                                <property name="password" value="userpassword"/>
+                                <property name="userName" value="user"/>
+                                <property name="sendTimeout" value="1000" />
+                                <property name="alwaysSyncSend" value="true" />                       
+        </bean>
+      -->
+        
+    <!-- JMS Consumer Configuration -->
+    <!-- 
+    <bean id="consumerConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory" destroy-method="destroy">
+                <property name="targetConnectionFactory" >
+                        <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                                <property name="brokerURL" value="tcp://localhost:61618"/>
+                                <property name="statsEnabled" value="true"/>
+                                <property name="password" value="userpassword"/>
+                                <property name="userName" value="user"/>
+                        </bean>
+                </property>
+                <property name="sessionCacheSize" value="10"/>
+                <property name="cacheProducers" value="false"/>
+        </bean>
+    
+    
+    <bean id="jmsConsumerConnectionFactory" 
+          class="org.springframework.jms.connection.SingleConnectionFactory"
+          p:targetConnectionFactory-ref="consumerConnectionFactory" />
+        
+    <jms:listener-container container-type="default"  destination-type="topic"
+                            connection-factory="jmsConsumerConnectionFactory"
+                            acknowledge="auto">
+        <jms:listener destination="My_topic" ref="jmsConsumer" method="onMessage"/>
+    </jms:listener-container>
+     -->
+
+    <!-- Counter for consumer to increment and test to verify count -->
+    <bean id="counter" class="java.util.concurrent.atomic.AtomicInteger" />
+    
+    
+    
+</beans>
+                    
