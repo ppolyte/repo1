@@ -43,46 +43,48 @@
           p:defaultDestination-ref="destination" 
           p:deliveryMode="1"
           p:timeToLive="20000" 
-          p:explicitQosEnabled="true"/>
+          p:explicitQosEnabled="false"/>
 
-     <!-- 
+      
     <bean id="connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
                 <property name="targetConnectionFactory" >
                         <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-                                 <property name="brokerURL" value="vm://localhost?broker.schedulerSupport=false&amp;broker.persistent=false"/>
-                                <property name="brokerURL" value="tcp://localhost:61616"/>  
-                                <property name="brokerURL" value="failover:(tcp://localhost:61616,tcp://localhost:61618)?randomize=true" />
+                         <!--         <property name="brokerURL" value="vm://localhost?broker.schedulerSupport=false&amp;broker.persistent=false"/> -->
+                                <property name="brokerURL" value="tcp://localhost:41616"/>  
+                         <!--   <property name="brokerURL" value="failover:(tcp://localhost:61616,tcp://localhost:61618)?randomize=true" /> --> 
                                 <property name="statsEnabled" value="true"/>
                                 <property name="password" value="userpassword"/>
                                 <property name="userName" value="user"/>
                                 <property name="sendTimeout" value="1000" />
                                 <property name="alwaysSyncSend" value="true" />
-                                 
+                                 <!-- 
                                 <property name="redeliveryPolicy">
                                 	<bean class="org.apache.activemq.RedeliveryPolicy" >
                                 		 <property name="maximumRedeliveries" value="0" />
                                 	</bean>
                                 </property>
-                                
+                                -->
                         </bean>
                 </property> 
+              <!-- 
                  <property name="sessionCacheSize" value="10"/>
-                 <property name="cacheProducers" value="false"/> 
+                 <property name="cacheProducers" value="false"/>
+                 --> 
         </bean>
-        -->
+        
    
    
-    
+    <!-- 
     <bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
            <property name="connectionFactory" >
                         <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-                                 <!--  <property name="brokerURL" value="vm://localhost?broker.schedulerSupport=false&amp;broker.persistent=false"/>
-                                <property name="brokerURL" value="tcp://localhost:61616"/>-->  
+                                   <property name="brokerURL" value="vm://localhost?broker.schedulerSupport=false&amp;broker.persistent=false"/>
+                                <property name="brokerURL" value="tcp://localhost:61616"/>  
                                 <property name="brokerURL" value="failover:(tcp://localhost:41616,tcp://localhost:41618)?randomize=true" />
                                 <property name="statsEnabled" value="true"/>
                                 <property name="password" value="userpassword"/>
                                 <property name="userName" value="user"/>
-<!--                                 <property name="sendTimeout" value="1000" /> -->
+                                 <property name="sendTimeout" value="1000" /> 
                                 <property name="alwaysSyncSend" value="true" />
                                  
                                
@@ -93,7 +95,7 @@
 			    <property name="idleTimeout" value="15000" />
 		       	<property name="expiryTimeout" value="0" />                    
         </bean>
-      
+-->      
             
     <!-- 
     <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">

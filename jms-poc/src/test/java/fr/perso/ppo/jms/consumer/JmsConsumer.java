@@ -30,7 +30,7 @@ public class JmsConsumer implements MessageListener, InitializingBean {
         
     	 logger.info("==================== INSIDE CONSUMER ==============START=============================================== ");
     	 try {
-			Thread.sleep(100);
+			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
 			logger.error("error in consumer", e1);
 		}
