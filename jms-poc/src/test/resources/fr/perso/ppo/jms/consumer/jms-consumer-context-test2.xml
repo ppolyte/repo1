@@ -5,6 +5,7 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans 
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context 
@@ -12,7 +13,9 @@
                            http://www.springframework.org/schema/jms 
                            http://www.springframework.org/schema/jms/spring-jms.xsd
                            http://activemq.apache.org/schema/core 
-                           http://activemq.apache.org/schema/core/activemq-core.xsd">
+                           http://activemq.apache.org/schema/core/activemq-core.xsd
+                           http://www.springframework.org/schema/task
+                           http://www.springframework.org/schema/task/spring-task.xsd">
  
     <context:component-scan base-package="fr.perso.ppo.jms.consumer" />
     
@@ -38,12 +41,51 @@
           p:targetConnectionFactory-ref="consumerConnectionFactory" />
         
     <jms:listener-container container-type="default"  destination-type="topic"
-                            connection-factory="jmsConsumerConnectionFactory"
-                            acknowledge="auto">  <!-- prefetch="1" cache="consumer" -->
+                            connection-factory="connectionFactory" 
+                            task-executor="executorWithPoolSizeRange"
+                            prefetch="1000"
+                            acknowledge="auto">  <!-- prefetch="1" cache="consumer"  connection-factory="jmsConsumerConnectionFactory | connectionFactory (pooled....) " -->
         <jms:listener destination="My_topic" ref="jmsConsumer" method="onMessage"/>
+         <jms:listener destination="My_topic2" ref="jmsConsumer" method="onMessage"/>
     </jms:listener-container>
 
     <!-- Counter for consumer to increment and test to verify count -->
     <bean id="counter" class="java.util.concurrent.atomic.AtomicInteger" />
+    
+    
+    
+     <bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+           <property name="connectionFactory" >
+                        <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                                 <!--  <property name="brokerURL" value="vm://localhost?broker.schedulerSupport=false&amp;broker.persistent=false"/>
+                                <property name="brokerURL" value="tcp://localhost:61616"/>-->  
+                                <property name="brokerURL" value="failover:(tcp://localhost:41616?socketBufferSize=131072&amp;trace=true&amp;wireFormat.cacheSize=2048&amp;wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=true&amp;keepAlive=true&amp;soTimeout=5000&amp;connectionTimeout=5000,tcp://localhost:41618?socketBufferSize=131072&amp;trace=true&amp;wireFormat.cacheSize=2048&amp;wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=true&amp;keepAlive=true&amp;soTimeout=5000&amp;connectionTimeout=5000)?randomize=true" />
+                                <property name="statsEnabled" value="true"/>
+                                <property name="password" value="userpassword"/>
+                                <property name="userName" value="user"/>
+<!--                                 <property name="sendTimeout" value="1000" /> -->
+                                <property name="alwaysSyncSend" value="true" />
+                                <property name="optimizeAcknowledge" value="true" />
+                                 
+                               
+                                
+                        </bean>
+                </property>
+                <property name="maxConnections" value="10" />
+			    <property name="idleTimeout" value="15000" />
+		       	<property name="expiryTimeout" value="0" />                    
+        </bean>
+        
+        <task:executor id="executorWithPoolSizeRange"
+	               pool-size="5-25"
+	               queue-capacity="100"/>
+	               
+	    <!--
+	     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+			  <property name="corePoolSize" value="5" />
+			  <property name="maxPoolSize" value="10" />
+			  <property name="queueCapacity" value="25" />
+		</bean>
+	     -->
     
 </beans>

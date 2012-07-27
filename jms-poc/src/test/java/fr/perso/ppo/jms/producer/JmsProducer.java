@@ -1,6 +1,7 @@
 package fr.perso.ppo.jms.producer;
 
 import javax.jms.DeliveryMode;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
@@ -32,6 +33,10 @@ public class JmsProducer implements InitializingBean{
 	@Autowired
 	private JmsTemplate template = null;
 	private int messageCount = 1000000;
+	@Autowired
+	private Destination destination;
+	@Autowired
+	private Destination destination2;
 
 	/**
 	 * Generates JMS messages
@@ -52,7 +57,7 @@ public class JmsProducer implements InitializingBean{
 						logger.error("error in producer", e1);
 					}
 				 
-				template.send(new MessageCreator() {
+				template.send(destination,new MessageCreator() {
 					public Message createMessage(Session session)
 							throws JMSException {
 						TextMessage message = session.createTextMessage(text);
@@ -68,6 +73,24 @@ public class JmsProducer implements InitializingBean{
 						return message;
 					}
 				});
+				if(i<1000)
+				template.send(destination2,new MessageCreator() {
+					public Message createMessage(Session session)
+							throws JMSException {
+						TextMessage message = session.createTextMessage(text);
+						message.setIntProperty(MESSAGE_COUNT, index);
+						
+						//message.setJMSTimestamp(10000);
+						//message.setJMSExpiration(5000);
+						//message.setBooleanProperty("droppable", true);
+						//message.setJMSRedelivered(false);
+
+						logger.info("Sending message: " + text);
+
+						return message;
+					}
+				});
+				
 			} catch (Exception e) {
 				/*
 				 * org.springframework.jms.UncategorizedJmsException: Uncategorized exception occured during JMS processing; nested exception is javax.jms.JMSException: org.apache.activemq.transport.RequestTimedOutIOException
