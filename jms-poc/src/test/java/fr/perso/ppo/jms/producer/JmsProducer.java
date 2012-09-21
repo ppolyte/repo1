@@ -44,6 +44,8 @@ public class JmsProducer implements InitializingBean{
 	// @PostConstruct
 	@Test
 	public void generateMessages() throws JMSException {
+		long start = System.currentTimeMillis();
+		long delta = 0;
 		
 		for (int i = 0; i < messageCount; i++) {
 			final int index = i;
@@ -73,7 +75,10 @@ public class JmsProducer implements InitializingBean{
 						return message;
 					}
 				});
-				if(i<1000)
+				if(i>1000)
+				delta = System.currentTimeMillis()-start;
+				
+				if(i<1000 || (i>1000 && delta>3*60*1000L)) {
 				template.send(destination2,new MessageCreator() {
 					public Message createMessage(Session session)
 							throws JMSException {
@@ -90,6 +95,7 @@ public class JmsProducer implements InitializingBean{
 						return message;
 					}
 				});
+				}
 				
 			} catch (Exception e) {
 				/*

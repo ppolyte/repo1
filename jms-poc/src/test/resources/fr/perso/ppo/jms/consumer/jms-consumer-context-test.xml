@@ -22,7 +22,7 @@
                         <bean class="org.apache.activemq.ActiveMQConnectionFactory">
                                 <!-- <property name="brokerURL" value="vm://localhost?broker.schedulerSupport=false&amp;broker.persistent=false"/> -->
                                 <!-- <property name="brokerURL" value="tcp://localhost:61618?jms.prefetchPolicy.all=50&amp;jms.prefetchPolicy.topicPrefetch=50"/>-->
-                                <property name="brokerURL" value="failover:(tcp://localhost:41616?socketBufferSize=131072&amp;trace=true&amp;wireFormat.cacheSize=2048&amp;wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=true&amp;keepAlive=true&amp;soTimeout=5000&amp;connectionTimeout=5000,tcp://localhost:41618?socketBufferSize=131072&amp;trace=true&amp;wireFormat.cacheSize=2048&amp;wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=true&amp;keepAlive=true&amp;soTimeout=5000&amp;connectionTimeout=5000)?randomize=true" />
+                                <property name="brokerURL" value="failover:(tcp://localhost:61616?socketBufferSize=131072&amp;trace=true&amp;wireFormat.cacheSize=2048&amp;wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=true&amp;keepAlive=true&amp;soTimeout=5000&amp;connectionTimeout=5000,tcp://localhost:61618?socketBufferSize=131072&amp;trace=true&amp;wireFormat.cacheSize=2048&amp;wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=true&amp;keepAlive=true&amp;soTimeout=5000&amp;connectionTimeout=5000)?randomize=true" />
                                 <property name="statsEnabled" value="true"/>
                                 <property name="password" value="userpassword"/>
                                 <property name="userName" value="user"/>
